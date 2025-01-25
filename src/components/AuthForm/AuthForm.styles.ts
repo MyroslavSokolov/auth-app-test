@@ -16,33 +16,20 @@ export const SignUpTxt = styled.p`
     text-align: center;
 `;
 
-export const Input = styled.input`
-    //width: 100%;
-    //padding: 10px;
-    //margin: 10px 0;
-    //border: 1px solid #ccc;
-    //border-radius: 4px;
-
-    //width: 311px;
-    //height: 56px;
-    //top: 528px;
-    //left: 140px;
-    //gap: 0px;
-    //border-radius: 60px;
-    //border: 2px 0px 0px 0px;
-
+export const Input = styled.input<{ isError: boolean }>`
     width: 315px;
     height: 48px;
     padding: 10px 10px 10px 20px;
     gap: 10px;
     border-radius: 10px;
-    border: 1px solid #ccc; // TODO fix here
+    border: 1px solid ${({ isError }) => (isError ? '#FF0000' : '#aaa')};
+    background-color: ${({ isError }) => (isError ? 'rgba(255, 0, 0, 0.65)' : 'white')};
     font-size: 16px;
     font-weight: 400;
     line-height: 19.36px;
 
     &:focus {
-        border-color: #007bff;
+        border-color: ${({ isError }) => (isError ? '#FF0000' : '#007bff')};
     }
 `;
 
@@ -58,19 +45,12 @@ export const PasswordContainer = styled.div`
 export const PasswordInput = styled(Input)`
 `;
 
-export const ShowHidePasswordButton = styled.div<{ iconColor: string }>`
+export const ShowHidePasswordToggle = styled.div`
     cursor: pointer;
     position: absolute;
     top: 60%;
     right: 15px;
     transform: translateY(-60%);
-
-    // svg {
-        //   fill: ${({ iconColor }) => iconColor};
-    //   width: 20px;
-    //   height: 20px;
-    //   transition: fill 0.3s ease;
-    // }
 `;
 
 export const PasswordRulesContainer = styled.div`

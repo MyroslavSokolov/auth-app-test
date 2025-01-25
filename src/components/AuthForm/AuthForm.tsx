@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { validatePassword } from '../../hooks/useValidation';
 import { emailRegex } from '../../utils/regex';
 import {
   EmailInput,
-  FormContainer, PasswordContainer,
+  FormContainer,
+  PasswordContainer,
   PasswordInput,
   PasswordRulesContainer,
+  ShowHidePasswordToggle,
   SignUpButton,
-  SignUpTxt, ShowHidePasswordButton,
+  SignUpTxt,
 } from './AuthForm.styles';
 import SuccessScreen from '../SuccessScreen/SuccessScreen';
 import HidePasswordIcon from '../icons/HidePasswordIcon.tsx';
@@ -29,49 +30,61 @@ const AuthForm: React.FC = () => {
   } = useForm<FormData>();
 
   const [isSuccess, setIsSuccess] = useState(false);
-  const [passwordValidationErrors, setPasswordValidationErrors] = useState<string[]>([]);
-
   const [showPassword, setShowPassword] = useState(false);
-  const [iconColor, setIconColor] = useState('#aaa'); // Default icon color
+  const [ruleColors, setRuleColors] = useState<string[]>(['#aaa', '#aaa', '#aaa']); // Colors for password rules
+
+  const passwordRules = [
+    {
+      text: '8 characters or more (no spaces)',
+      validate: (password: string) => password.length >= 8 && !password.includes(' '),
+    },
+    {
+      text: 'Uppercase and lowercase letters',
+      validate: (password: string) => /[A-Z]/.test(password) && /[a-z]/.test(password),
+    },
+    { text: 'At least one digit', validate: (password: string) => /\d/.test(password) },
+  ];
 
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
-    setIconColor(showPassword ? '#aaa' : '#007bff'); // Change color on toggle
   };
 
   const onSubmit = (data: FormData) => {
     const passwordErrors = validatePassword(data.password);
+    const passwordErrors = passwordRules
+      .filter((rule) => !rule.validate(data.password))
+      .map((rule) => rule.text);
+
     if (!emailRegex.test(data.email)) {
       setError('email', { type: 'manual', message: 'Invalid email address' });
     }
+
     if (passwordErrors.length > 0) {
       setError('password', { type: 'manual', message: passwordErrors.join(', ') });
+      setRuleColors(ruleColors.map((_, index) => (passwordErrors.includes(passwordRules[index].text) ? '#FF0000' : '#27B274B2')));
+    } else {
+      setRuleColors(ruleColors.map(() => '#27B274B2'));
     }
 
-    if (!errors.email && !errors.password) {
+    if (!errors.email && !errors.password && passwordErrors.length === 0) {
       console.log('Form Submitted', data);
       setIsSuccess(true);
     }
   };
 
-  const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const email = event.target.value;
-    if (!emailRegex.test(email)) {
-      setError('email', { type: 'manual', message: 'Invalid email format' });
-    } else {
-      clearErrors('email');
-    }
-  };
-
   const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const password = event.target.value;
-    const errors = validatePassword(password);
-    setPasswordValidationErrors(errors);
 
-    if (errors.length > 0) {
-      setError('password', { type: 'manual', message: 'Invalid password' });
-    } else {
+    const updatedColors = passwordRules.map((rule) =>
+      rule.validate(password) ? '#27B274B2' : '#aaa',
+    );
+
+    setRuleColors(updatedColors);
+
+    if (passwordRules.every((rule) => rule.validate(password))) {
       clearErrors('password');
+    } else {
+      setError('password', { type: 'manual', message: 'Invalid password' });
     }
   };
 
@@ -83,8 +96,16 @@ const AuthForm: React.FC = () => {
       <form onSubmit={handleSubmit(onSubmit)}>
         <EmailInput
           {...register('email', { required: 'Email is required' })}
-          placeholder="Email"
-          onChange={handleEmailChange}
+          placeholder="example@emai.com"
+          onChange={(e) => {
+            const email = e.target.value;
+            if (!emailRegex.test(email)) {
+              setError('email', { type: 'manual', message: 'Invalid email format' });
+            } else {
+              clearErrors('email');
+            }
+          }}
+          isError={!!errors.email}
         />
         {errors.email && <span>{errors.email.message}</span>}
 
@@ -102,34 +123,24 @@ const AuthForm: React.FC = () => {
             onChange={handlePasswordChange}
             type={showPassword ? 'text' : 'password'}
             placeholder="Create your password"
-            onFocus={() => setIconColor('#007bff')}
-            onBlur={() => setIconColor('#aaa')}
+            isError={!!errors.password}
           />
-          <ShowHidePasswordButton onClick={togglePasswordVisibility} iconColor={iconColor} aria-label="Toggle Password">
-            {showPassword ? <HidePasswordIcon /> : <ShowPasswordIcon />}
-          </ShowHidePasswordButton>
+          <ShowHidePasswordToggle onClick={togglePasswordVisibility} aria-label="Toggle Password">
+            {showPassword ? (
+              <HidePasswordIcon fill={errors.password ? '#FF0000' : '#aaa'} />
+            ) : (
+              <ShowPasswordIcon fill={errors.password ? '#FF0000' : '#aaa'} />
+            )}
+          </ShowHidePasswordToggle>
         </PasswordContainer>
 
-
-        <div>
-          {passwordValidationErrors.map((error, index) => (
-            <span key={index} style={{ color: 'red', display: 'block' }}>
-              {error}
-            </span>
-          ))}
-        </div>
-        {errors.password && <span>{errors.password.message}</span>}
-
         <PasswordRulesContainer>
-          {/*TODO extract to function*/}
-          <span>8 characters or more (no spaces)</span>
-          <br />
-          <span>Uppercase and lowercase letters</span>
-          <br />
-          <span>At least one digit</span>
-          <br />
+          {passwordRules.map((rule, index) => (
+            <p key={index} style={{ color: ruleColors[index] }}>
+              {rule.text}
+            </p>
+          ))}
         </PasswordRulesContainer>
-
 
         <SignUpButton type="submit">Sign Up</SignUpButton>
       </form>
