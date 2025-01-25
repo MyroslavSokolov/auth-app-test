@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
 import { useTheme } from 'styled-components';
 import { emailRegex } from '../../utils/regex';
 import {
@@ -18,20 +17,7 @@ import ShowPasswordIcon from '../icons/ShowPasswordIcon.tsx';
 
 const INVALID_EMAIL_ADDRESS = 'Invalid email address';
 
-interface FormData {
-  email: string;
-  password: string;
-}
-
 const AuthForm: React.FC = () => {
-  const {
-    register,
-    handleSubmit,
-    setError,
-    clearErrors,
-    formState: { errors },
-  } = useForm<FormData>();
-
   const theme = useTheme();
   const [isSuccess, setIsSuccess] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -40,6 +26,10 @@ const AuthForm: React.FC = () => {
     theme.colors.borderDefault,
     theme.colors.borderDefault,
   ]);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
 
   const passwordRules = [
     {
@@ -57,41 +47,57 @@ const AuthForm: React.FC = () => {
     setShowPassword((prev) => !prev);
   };
 
-  const onSubmit = (data: FormData) => {
-    const passwordErrors = passwordRules
-      .filter((rule) => !rule.validate(data.password))
-      .map((rule) => rule.text);
+  const validateForm = () => {
+    let isValid = true;
 
-    if (!emailRegex.test(data.email)) {
-      setError('email', { type: 'manual', message: INVALID_EMAIL_ADDRESS });
+    // Validate email
+    if (!emailRegex.test(email)) {
+      setEmailError(INVALID_EMAIL_ADDRESS);
+      isValid = false;
+    } else {
+      setEmailError(null);
     }
 
+    // Validate password
+    const passwordErrors = passwordRules
+      .filter((rule) => !rule.validate(password))
+      .map((rule) => rule.text);
+
     if (passwordErrors.length > 0) {
-      setError('password', { type: 'manual', message: passwordErrors.join(', ') });
+      setPasswordError(passwordErrors.join(', '));
       setRuleColors(ruleColors.map((_, index) => (passwordErrors.includes(passwordRules[index].text) ? theme.colors.error : theme.colors.success)));
+      isValid = false;
     } else {
+      setPasswordError(null);
       setRuleColors(ruleColors.map(() => theme.colors.success));
     }
 
-    if (!errors.email && !errors.password && passwordErrors.length === 0) {
-      console.log('Form Submitted', data);
+    return isValid;
+  };
+
+  const handleSubmit = () => {
+    const isValid = validateForm();
+
+    if (isValid) {
+      console.log('Form Submitted', { email, password });
       setIsSuccess(true);
     }
   };
 
   const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const password = event.target.value;
+    const newPassword = event.target.value;
+    setPassword(newPassword);
 
     const updatedColors = passwordRules.map((rule) =>
-      rule.validate(password) ? theme.colors.success : theme.colors.borderDefault,
+      rule.validate(newPassword) ? theme.colors.success : theme.colors.borderDefault,
     );
 
     setRuleColors(updatedColors);
 
-    if (passwordRules.every((rule) => rule.validate(password))) {
-      clearErrors('password');
+    if (passwordRules.every((rule) => rule.validate(newPassword))) {
+      setPasswordError(null);
     } else {
-      setError('password', { type: 'manual', message: 'Invalid password' });
+      setPasswordError('Invalid password');
     }
   };
 
@@ -100,38 +106,37 @@ const AuthForm: React.FC = () => {
   return (
     <FormContainer>
       <SignUpTxt>Sign Up</SignUpTxt>
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <div>
         <EmailInput
-          {...register('email', { required: 'Email is required' })}
-          placeholder="example@emai.com"
+          value={email}
+          placeholder="example@email.com"
           onChange={(e) => {
-            const email = e.target.value;
-            if (!emailRegex.test(email)) {
-              setError('email', { type: 'manual', message: INVALID_EMAIL_ADDRESS });
+            setEmail(e.target.value);
+            if (!emailRegex.test(e.target.value)) {
+              setEmailError(INVALID_EMAIL_ADDRESS);
             } else {
-              clearErrors('email');
+              setEmailError(null);
             }
           }}
-          isError={!!errors.email}
+          isError={!!emailError}
         />
         <InputRulesContainer>
-          {errors.email && <p style={{ color: theme.colors.error }}>{errors.email.message}</p>}
+          {emailError && <p style={{ color: theme.colors.error }}>{emailError}</p>}
         </InputRulesContainer>
-
 
         <PasswordContainer>
           <PasswordInput
-            {...register('password', { required: 'Password is required' })}
+            value={password}
             onChange={handlePasswordChange}
             type={showPassword ? 'text' : 'password'}
             placeholder="Create your password"
-            isError={!!errors.password}
+            isError={!!passwordError}
           />
           <ShowHidePasswordToggle onClick={togglePasswordVisibility} aria-label="Toggle Password">
             {showPassword ? (
-              <HidePasswordIcon fill={errors.password ? theme.colors.error : theme.colors.borderDefault} />
+              <HidePasswordIcon fill={passwordError ? theme.colors.error : theme.colors.borderDefault} />
             ) : (
-              <ShowPasswordIcon fill={errors.password ? theme.colors.error : theme.colors.borderDefault} />
+              <ShowPasswordIcon fill={passwordError ? theme.colors.error : theme.colors.borderDefault} />
             )}
           </ShowHidePasswordToggle>
         </PasswordContainer>
@@ -144,8 +149,10 @@ const AuthForm: React.FC = () => {
           ))}
         </InputRulesContainer>
 
-        <SignUpButton type="submit">Sign Up</SignUpButton>
-      </form>
+        <SignUpButton type="button" onClick={handleSubmit}>
+          Sign Up
+        </SignUpButton>
+      </div>
     </FormContainer>
   );
 };
