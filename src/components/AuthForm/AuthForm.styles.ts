@@ -29,7 +29,9 @@ export const Input = styled.input<{ isError: boolean }>`
     line-height: 19.36px;
 
     &:focus {
-        border-color: ${({ theme, isError }) => (isError ? theme.colors.error : theme.colors.borderFocus)};
+        border-color: ${({ theme }) => theme.colors.borderFocus};
+        background-color: ${({ theme }) => theme.colors.backgroundDefault};
+        color: ${({ theme }) => theme.colors.borderDefault};
     }
 `;
 
@@ -50,7 +52,7 @@ export const ShowHidePasswordToggle = styled.div`
     transform: translateY(-60%);
 `;
 
-export const PasswordRulesContainer = styled.div`
+export const InputRulesContainer = styled.div`
     text-align: left;
     padding: 0 20px;
     margin-top: 20px;

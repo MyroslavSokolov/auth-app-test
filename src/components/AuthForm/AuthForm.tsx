@@ -7,7 +7,7 @@ import {
   FormContainer,
   PasswordContainer,
   PasswordInput,
-  PasswordRulesContainer,
+  InputRulesContainer,
   ShowHidePasswordToggle,
   SignUpButton,
   SignUpTxt,
@@ -15,6 +15,8 @@ import {
 import SuccessScreen from '../SuccessScreen/SuccessScreen';
 import HidePasswordIcon from '../icons/HidePasswordIcon.tsx';
 import ShowPasswordIcon from '../icons/ShowPasswordIcon.tsx';
+
+const INVALID_EMAIL_ADDRESS = 'Invalid email address';
 
 interface FormData {
   email: string;
@@ -61,7 +63,7 @@ const AuthForm: React.FC = () => {
       .map((rule) => rule.text);
 
     if (!emailRegex.test(data.email)) {
-      setError('email', { type: 'manual', message: 'Invalid email address' });
+      setError('email', { type: 'manual', message: INVALID_EMAIL_ADDRESS });
     }
 
     if (passwordErrors.length > 0) {
@@ -105,7 +107,7 @@ const AuthForm: React.FC = () => {
           onChange={(e) => {
             const email = e.target.value;
             if (!emailRegex.test(email)) {
-              setError('email', { type: 'manual', message: 'Invalid email format' });
+              setError('email', { type: 'manual', message: INVALID_EMAIL_ADDRESS });
             } else {
               clearErrors('email');
             }
@@ -130,13 +132,13 @@ const AuthForm: React.FC = () => {
           </ShowHidePasswordToggle>
         </PasswordContainer>
 
-        <PasswordRulesContainer>
+        <InputRulesContainer>
           {passwordRules.map((rule, index) => (
             <p key={index} style={{ color: ruleColors[index] }}>
               {rule.text}
             </p>
           ))}
-        </PasswordRulesContainer>
+        </InputRulesContainer>
 
         <SignUpButton type="submit">Sign Up</SignUpButton>
       </form>
