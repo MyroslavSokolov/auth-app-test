@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useTheme } from 'styled-components';
 import { emailRegex } from '../../utils/regex';
 import {
   EmailInput,
@@ -29,9 +30,14 @@ const AuthForm: React.FC = () => {
     formState: { errors },
   } = useForm<FormData>();
 
+  const theme = useTheme();
   const [isSuccess, setIsSuccess] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [ruleColors, setRuleColors] = useState<string[]>(['#aaa', '#aaa', '#aaa']); // Colors for password rules
+  const [ruleColors, setRuleColors] = useState<string[]>([
+    theme.colors.borderDefault,
+    theme.colors.borderDefault,
+    theme.colors.borderDefault,
+  ]);
 
   const passwordRules = [
     {
@@ -50,7 +56,6 @@ const AuthForm: React.FC = () => {
   };
 
   const onSubmit = (data: FormData) => {
-    const passwordErrors = validatePassword(data.password);
     const passwordErrors = passwordRules
       .filter((rule) => !rule.validate(data.password))
       .map((rule) => rule.text);
@@ -61,9 +66,9 @@ const AuthForm: React.FC = () => {
 
     if (passwordErrors.length > 0) {
       setError('password', { type: 'manual', message: passwordErrors.join(', ') });
-      setRuleColors(ruleColors.map((_, index) => (passwordErrors.includes(passwordRules[index].text) ? '#FF0000' : '#27B274B2')));
+      setRuleColors(ruleColors.map((_, index) => (passwordErrors.includes(passwordRules[index].text) ? theme.colors.error : theme.colors.success)));
     } else {
-      setRuleColors(ruleColors.map(() => '#27B274B2'));
+      setRuleColors(ruleColors.map(() => theme.colors.success));
     }
 
     if (!errors.email && !errors.password && passwordErrors.length === 0) {
@@ -76,7 +81,7 @@ const AuthForm: React.FC = () => {
     const password = event.target.value;
 
     const updatedColors = passwordRules.map((rule) =>
-      rule.validate(password) ? '#27B274B2' : '#aaa',
+      rule.validate(password) ? theme.colors.success : theme.colors.borderDefault,
     );
 
     setRuleColors(updatedColors);
@@ -107,15 +112,6 @@ const AuthForm: React.FC = () => {
           }}
           isError={!!errors.email}
         />
-        {errors.email && <span>{errors.email.message}</span>}
-
-        <br />
-        {/*<PasswordInput*/}
-        {/*  {...register('password', { required: 'Password is required' })}*/}
-        {/*  placeholder="Password"*/}
-        {/*  type="password"*/}
-        {/*  onChange={handlePasswordChange}*/}
-        {/*/>*/}
 
         <PasswordContainer>
           <PasswordInput
@@ -127,9 +123,9 @@ const AuthForm: React.FC = () => {
           />
           <ShowHidePasswordToggle onClick={togglePasswordVisibility} aria-label="Toggle Password">
             {showPassword ? (
-              <HidePasswordIcon fill={errors.password ? '#FF0000' : '#aaa'} />
+              <HidePasswordIcon fill={errors.password ? theme.colors.error : theme.colors.borderDefault} />
             ) : (
-              <ShowPasswordIcon fill={errors.password ? '#FF0000' : '#aaa'} />
+              <ShowPasswordIcon fill={errors.password ? theme.colors.error : theme.colors.borderDefault} />
             )}
           </ShowHidePasswordToggle>
         </PasswordContainer>
