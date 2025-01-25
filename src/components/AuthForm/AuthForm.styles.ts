@@ -24,6 +24,7 @@ export const Input = styled.input<{ isError: boolean }>`
     border-radius: 10px;
     border: 1px solid ${({ theme, isError }) => (isError ? theme.colors.error : theme.colors.borderDefault)};
     background-color: ${({ theme, isError }) => (isError ? theme.colors.backgroundError : theme.colors.backgroundDefault)};
+    color: ${({ theme, isError }) => (isError ? theme.colors.error : theme.colors.borderDefault)};
     font-size: 16px;
     font-weight: 400;
     line-height: 19.36px;

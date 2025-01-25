@@ -114,6 +114,10 @@ const AuthForm: React.FC = () => {
           }}
           isError={!!errors.email}
         />
+        <InputRulesContainer>
+          {errors.email && <p style={{ color: theme.colors.error }}>{errors.email.message}</p>}
+        </InputRulesContainer>
+
 
         <PasswordContainer>
           <PasswordInput
