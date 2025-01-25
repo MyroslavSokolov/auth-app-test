@@ -28,8 +28,8 @@ const AuthForm: React.FC = () => {
   ]);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [emailError, setEmailError] = useState<string | null>(null);
-  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [hasEmailError, setHasEmailError] = useState(false);
+  const [hasPasswordError, setHasPasswordError] = useState(false);
 
   const passwordRules = [
     {
@@ -52,10 +52,10 @@ const AuthForm: React.FC = () => {
 
     // Validate email
     if (!emailRegex.test(email)) {
-      setEmailError(INVALID_EMAIL_ADDRESS);
+      setHasEmailError(true);
       isValid = false;
     } else {
-      setEmailError(null);
+      setHasEmailError(false);
     }
 
     // Validate password
@@ -64,11 +64,11 @@ const AuthForm: React.FC = () => {
       .map((rule) => rule.text);
 
     if (passwordErrors.length > 0) {
-      setPasswordError(passwordErrors.join(', '));
+      setHasPasswordError(true);
       setRuleColors(ruleColors.map((_, index) => (passwordErrors.includes(passwordRules[index].text) ? theme.colors.error : theme.colors.success)));
       isValid = false;
     } else {
-      setPasswordError(null);
+      setHasPasswordError(false);
       setRuleColors(ruleColors.map(() => theme.colors.success));
     }
 
@@ -95,9 +95,9 @@ const AuthForm: React.FC = () => {
     setRuleColors(updatedColors);
 
     if (passwordRules.every((rule) => rule.validate(newPassword))) {
-      setPasswordError(null);
+      setHasPasswordError(false);
     } else {
-      setPasswordError('Invalid password');
+      setHasPasswordError(true);
     }
   };
 
@@ -113,15 +113,15 @@ const AuthForm: React.FC = () => {
           onChange={(e) => {
             setEmail(e.target.value);
             if (!emailRegex.test(e.target.value)) {
-              setEmailError(INVALID_EMAIL_ADDRESS);
+              setHasEmailError(true);
             } else {
-              setEmailError(null);
+              setHasEmailError(false);
             }
           }}
-          isError={!!emailError}
+          isError={hasEmailError}
         />
         <InputRulesContainer>
-          {emailError && <p style={{ color: theme.colors.error }}>{emailError}</p>}
+          {hasEmailError && <p style={{ color: theme.colors.error }}>{INVALID_EMAIL_ADDRESS}</p>}
         </InputRulesContainer>
 
         <PasswordContainer>
@@ -130,13 +130,13 @@ const AuthForm: React.FC = () => {
             onChange={handlePasswordChange}
             type={showPassword ? 'text' : 'password'}
             placeholder="Create your password"
-            isError={!!passwordError}
+            isError={hasPasswordError}
           />
           <ShowHidePasswordToggle onClick={togglePasswordVisibility} aria-label="Toggle Password">
             {showPassword ? (
-              <HidePasswordIcon fill={passwordError ? theme.colors.error : theme.colors.borderDefault} />
+              <HidePasswordIcon fill={hasPasswordError ? theme.colors.error : theme.colors.borderDefault} />
             ) : (
-              <ShowPasswordIcon fill={passwordError ? theme.colors.error : theme.colors.borderDefault} />
+              <ShowPasswordIcon fill={hasPasswordError ? theme.colors.error : theme.colors.borderDefault} />
             )}
           </ShowHidePasswordToggle>
         </PasswordContainer>
