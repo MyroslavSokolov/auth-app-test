@@ -8,6 +8,10 @@ export const theme = {
     borderFocus: '#007bff',
     backgroundDefault: 'white',
     backgroundError: '#FDEFEE',
+    backgroundSuccess: '#E6F7ED',
     textPrimary: '#4A4E71',
+    disabledBackground: '#151D511A',
+    disabledText: '#151D51',
+    disabledBorder: '#151D5133',
   },
 };

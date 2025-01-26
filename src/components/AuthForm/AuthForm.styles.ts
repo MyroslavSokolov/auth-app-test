@@ -46,6 +46,13 @@ export const Input = styled.input<{ $isError: boolean; $isSuccess?: boolean }>`
                 $isSuccess ? theme.colors.backgroundSuccess : theme.colors.backgroundDefault};
         color: ${({ theme, $isSuccess }) => ($isSuccess ? theme.colors.success : theme.colors.borderDefault)};
     }
+
+    &:disabled {
+        background-color: ${({ theme }) => theme.colors.disabledBackground};
+        color: ${({ theme }) => theme.colors.disabledText};
+        border-color: ${({ theme }) => theme.colors.disabledBorder};
+        cursor: not-allowed;
+    }
 `;
 
 export const EmailInput = styled(Input)``;
