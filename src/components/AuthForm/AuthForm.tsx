@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useTheme } from 'styled-components';
-import { emailRegex } from '../../utils/regex';
+import { emailRegex, passwordRegex } from '../../utils/regex';
 import {
   EmailInput,
   FormContainer,
@@ -36,17 +36,29 @@ const AuthForm: React.FC = () => {
   const passwordRules = [
     {
       text: '8 characters or more (no spaces)',
-      validate: (password: string) => password.length >= 8 && !password.includes(' '),
+      validate: (password: string) =>
+        password.length >= passwordRegex.minLength &&
+        password.length <= passwordRegex.maxLength &&
+        passwordRegex.noSpaces.test(password),
     },
     {
       text: 'Uppercase and lowercase letters',
-      validate: (password: string) => /[A-Z]/.test(password) && /[a-z]/.test(password),
+      validate: (password: string) =>
+        passwordRegex.uppercase.test(password) && passwordRegex.lowercase.test(password),
     },
-    { text: 'At least one digit', validate: (password: string) => /\d/.test(password) },
+    {
+      text: 'At least one digit',
+      validate: (password: string) => passwordRegex.number.test(password),
+    },
   ];
 
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
+  };
+
+  const getIconFillColor = () => {
+    const hasError = ruleColors.some((color) => color === theme.colors.error);
+    return hasError ? theme.colors.error : theme.colors.borderDefault;
   };
 
   const validateForm = () => {
@@ -132,9 +144,9 @@ const AuthForm: React.FC = () => {
           />
           <ShowHidePasswordToggle onClick={togglePasswordVisibility} aria-label="Toggle Password">
             {showPassword ? (
-              <HidePasswordIcon fill={hasPasswordError ? theme.colors.error : theme.colors.borderDefault} />
+              <HidePasswordIcon fill={getIconFillColor()} />
             ) : (
-              <ShowPasswordIcon fill={hasPasswordError ? theme.colors.error : theme.colors.borderDefault} />
+              <ShowPasswordIcon fill={getIconFillColor()} />
             )}
           </ShowHidePasswordToggle>
         </PasswordContainer>

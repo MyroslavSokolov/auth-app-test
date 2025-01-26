@@ -26,7 +26,7 @@ export const SignUpTxt = styled.p`
 export const Input = styled.input<{ $isError: boolean; $isSuccess?: boolean }>`
     width: 315px;
     height: 48px;
-    padding: 10px 10px 10px 20px;
+    padding: 1px 20px;
     gap: 10px;
     border-radius: 10px;
     border: 1px solid
