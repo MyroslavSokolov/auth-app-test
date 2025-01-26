@@ -30,6 +30,8 @@ const AuthForm: React.FC = () => {
   const [password, setPassword] = useState('');
   const [hasEmailError, setHasEmailError] = useState(false);
   const [hasPasswordError, setHasPasswordError] = useState(false);
+  const [isEmailValid, setIsEmailValid] = useState(false);
+  const [isPasswordValid, setIsPasswordValid] = useState(false);
 
   const passwordRules = [
     {
@@ -51,26 +53,24 @@ const AuthForm: React.FC = () => {
     let isValid = true;
 
     // Validate email
-    if (!emailRegex.test(email)) {
-      setHasEmailError(true);
-      isValid = false;
-    } else {
-      setHasEmailError(false);
-    }
+    const isEmailValid = emailRegex.test(email);
+    setHasEmailError(!isEmailValid);
+    setIsEmailValid(isEmailValid);
+    if (!isEmailValid) isValid = false;
 
     // Validate password
     const passwordErrors = passwordRules
       .filter((rule) => !rule.validate(password))
       .map((rule) => rule.text);
 
-    if (passwordErrors.length > 0) {
-      setHasPasswordError(true);
-      setRuleColors(ruleColors.map((_, index) => (passwordErrors.includes(passwordRules[index].text) ? theme.colors.error : theme.colors.success)));
-      isValid = false;
-    } else {
-      setHasPasswordError(false);
-      setRuleColors(ruleColors.map(() => theme.colors.success));
-    }
+    const isPasswordValid = passwordErrors.length === 0;
+    setHasPasswordError(!isPasswordValid);
+    setIsPasswordValid(isPasswordValid);
+    if (!isPasswordValid) isValid = false;
+
+    setRuleColors(
+      passwordRules.map((rule) => (rule.validate(password) ? theme.colors.success : theme.colors.error))
+    );
 
     return isValid;
   };
@@ -89,16 +89,14 @@ const AuthForm: React.FC = () => {
     setPassword(newPassword);
 
     const updatedColors = passwordRules.map((rule) =>
-      rule.validate(newPassword) ? theme.colors.success : theme.colors.borderDefault,
+      rule.validate(newPassword) ? theme.colors.success : theme.colors.borderDefault
     );
 
     setRuleColors(updatedColors);
 
-    if (passwordRules.every((rule) => rule.validate(newPassword))) {
-      setHasPasswordError(false);
-    } else {
-      setHasPasswordError(true);
-    }
+    const isPasswordValid = passwordRules.every((rule) => rule.validate(newPassword));
+    setHasPasswordError(!isPasswordValid);
+    setIsPasswordValid(isPasswordValid);
   };
 
   if (isSuccess) return <SuccessScreen />;
@@ -112,13 +110,12 @@ const AuthForm: React.FC = () => {
           placeholder="example@email.com"
           onChange={(e) => {
             setEmail(e.target.value);
-            if (!emailRegex.test(e.target.value)) {
-              setHasEmailError(true);
-            } else {
-              setHasEmailError(false);
-            }
+            const isEmailValid = emailRegex.test(e.target.value);
+            setHasEmailError(!isEmailValid);
+            setIsEmailValid(isEmailValid);
           }}
-          isError={hasEmailError}
+          $isError={hasEmailError}
+          $isSuccess={isEmailValid}
         />
         <InputRulesContainer>
           {hasEmailError && <p style={{ color: theme.colors.error }}>{INVALID_EMAIL_ADDRESS}</p>}
@@ -130,7 +127,8 @@ const AuthForm: React.FC = () => {
             onChange={handlePasswordChange}
             type={showPassword ? 'text' : 'password'}
             placeholder="Create your password"
-            isError={hasPasswordError}
+            $isError={hasPasswordError}
+            $isSuccess={isPasswordValid}
           />
           <ShowHidePasswordToggle onClick={togglePasswordVisibility} aria-label="Toggle Password">
             {showPassword ? (

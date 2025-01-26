@@ -23,23 +23,28 @@ export const SignUpTxt = styled.p`
     text-align: center;
 `;
 
-export const Input = styled.input<{ isError: boolean }>`
+export const Input = styled.input<{ $isError: boolean; $isSuccess?: boolean }>`
     width: 315px;
     height: 48px;
     padding: 10px 10px 10px 20px;
     gap: 10px;
     border-radius: 10px;
-    border: 1px solid ${({ theme, isError }) => (isError ? theme.colors.error : theme.colors.borderDefault)};
-    background-color: ${({ theme, isError }) => (isError ? theme.colors.backgroundError : theme.colors.backgroundDefault)};
-    color: ${({ theme, isError }) => (isError ? theme.colors.error : theme.colors.borderDefault)};
+    border: 1px solid
+    ${({ theme, $isError, $isSuccess }) =>
+            $isError ? theme.colors.error : $isSuccess ? theme.colors.success : theme.colors.borderDefault};
+    background-color: ${({ theme, $isError, $isSuccess }) =>
+            $isError ? theme.colors.backgroundError : $isSuccess ? theme.colors.backgroundSuccess : theme.colors.backgroundDefault};
+    color: ${({ theme, $isError, $isSuccess }) =>
+            $isError ? theme.colors.error : $isSuccess ? theme.colors.success : theme.colors.borderDefault};
     font-size: 16px;
     font-weight: 400;
     line-height: 19.36px;
 
     &:focus {
-        border-color: ${({ theme }) => theme.colors.borderFocus};
-        background-color: ${({ theme }) => theme.colors.backgroundDefault};
-        color: ${({ theme }) => theme.colors.borderDefault};
+        border-color: ${({ theme, $isSuccess }) => ($isSuccess ? theme.colors.success : theme.colors.borderFocus)};
+        background-color: ${({ theme, $isSuccess }) =>
+                $isSuccess ? theme.colors.backgroundSuccess : theme.colors.backgroundDefault};
+        color: ${({ theme, $isSuccess }) => ($isSuccess ? theme.colors.success : theme.colors.borderDefault)};
     }
 `;
 
