@@ -44,7 +44,7 @@ export const Input = styled.input<{ $isError: boolean; $isSuccess?: boolean }>`
         border-color: ${({ theme, $isSuccess }) => ($isSuccess ? theme.colors.success : theme.colors.borderFocus)};
         background-color: ${({ theme, $isSuccess }) =>
                 $isSuccess ? theme.colors.backgroundSuccess : theme.colors.backgroundDefault};
-        color: ${({ theme, $isSuccess }) => ($isSuccess ? theme.colors.success : theme.colors.borderDefault)};
+        color: ${({ theme, $isSuccess }) => ($isSuccess ? theme.colors.success : theme.colors.borderFocus)};
     }
 
     &:disabled {

@@ -5,7 +5,7 @@ export const theme = {
     error: '#FF8080',
     success: '#27B274B2',
     borderDefault: '#aaa',
-    borderFocus: '#007bff',
+    borderFocus: '#151D51',
     backgroundDefault: 'white',
     backgroundError: '#FDEFEE',
     backgroundSuccess: '#E6F7ED',
