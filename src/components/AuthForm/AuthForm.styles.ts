@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import dbStars from '../../assets/bgStars.png';
 
 export const FormContainer = styled.div`
     display: flex;
@@ -6,6 +7,12 @@ export const FormContainer = styled.div`
     align-items: center;
     justify-content: center;
     width: 315px;
+    background-color: #CFE1F4;
+    background-image: url(${dbStars});
+    background-blend-mode: overlay;
+    background-position: center;
+    padding: 50px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 `;
 
 export const SignUpTxt = styled.p`
